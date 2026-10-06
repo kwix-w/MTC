@@ -1,17 +1,55 @@
 package org.example;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    static void main() {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        IO.println(String.format("Hello and welcome!"));
+import java.math.BigDecimal;
+import java.util.Scanner;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            IO.println("i = " + i);
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        Account account = new Account(12345, 999, new BigDecimal("10000.00"), BankType.AUM);
+        System.out.println("Эталонный аккаунт в базе: " + account);
+
+        System.out.println("Введите 5-значный номер карты: ");
+        if (!scanner.hasNextInt()){
+            System.out.println("Ошибка доступа: номер карты должен быть числом.");
+            return;
         }
+        int enteredCard = scanner.nextInt();
+        System.out.println("Введите 3-значный пин-код: ");
+        if (!scanner.hasNextInt()) {
+            System.out.println("Ошибка доступа: пин-код должен быть числом.");
+            return;
+        }
+        int enteredPin = scanner.nextInt();
+        if (enteredCard != account.getCardNum() || enteredPin != account.getPin()) {
+            System.out.println("Ошибка доступа: неверный номер карты или пин-код.");
+            return;
+        }
+        System.out.println("Авторизация успешна.\n");
+        CashMachine bankomat = new CashMachine();
+
+        System.out.println("Введите сумму для внесения: ");
+        if (!scanner.hasNextBigDecimal()) {
+            System.out.println("Ошибка: неверный формат суммы.");
+            return;
+        }
+        BigDecimal depositSum = scanner.nextBigDecimal();
+        account.balance = bankomat.deposit(account.getBalance(), depositSum);
+        System.out.println("Обновленный баланс после внесения: " + account.getBalance() + " руб.");
+        System.out.println();
+
+        System.out.print("Введите сумму для снятия: ");
+        if (!scanner.hasNextBigDecimal()) {
+            System.out.println("Ошибка: неверный формат суммы.");
+            return;
+        }
+        BigDecimal withdrawSum = scanner.nextBigDecimal();
+        account.balance = bankomat.withdraw(account.getBalance(), withdrawSum, account.getBankType());
+        System.out.println("Обновленный баланс после снятия: " + account.getBalance() + " руб.");
+
+
+
     }
 }
